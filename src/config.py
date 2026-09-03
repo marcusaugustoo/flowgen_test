@@ -90,6 +90,12 @@ class LoggingConfig:
 
 
 @dataclass
+class TasksConfig:
+    """Tasks configuration for .txt file loading."""
+    path: Optional[str] = None  # Path to a .txt file or directory of .txt files
+
+
+@dataclass
 class ResultsConfig:
     """Results storage configuration."""
     output_dir: str = "results"
@@ -115,6 +121,7 @@ class ExperimentConfig:
     evaluation: EvaluationConfig = field(default_factory=EvaluationConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
     results: ResultsConfig = field(default_factory=ResultsConfig)
+    tasks: TasksConfig = field(default_factory=TasksConfig)
 
     # Raw dict for any extra keys
     _raw: dict = field(default_factory=dict, repr=False)
@@ -137,6 +144,7 @@ class ExperimentConfig:
             evaluation=EvaluationConfig(**{k: v for k, v in data.get("evaluation", {}).items()}),
             logging=LoggingConfig(**{k: v for k, v in data.get("logging", {}).items()}),
             results=ResultsConfig(**{k: v for k, v in data.get("results", {}).items()}),
+            tasks=TasksConfig(**{k: v for k, v in data.get("tasks", {}).items()}),
             _raw=data,
         )
         return config
@@ -229,6 +237,9 @@ class ExperimentConfig:
             },
             "results": {
                 "output_dir": self.results.output_dir,
+            },
+            "tasks": {
+                "path": self.tasks.path,
             },
         }
 

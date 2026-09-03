@@ -14,3 +14,13 @@ env/
 # FlowGen specific logs and results
 logs/
 results/
+
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing and Coverage
+.coverage
+htmlcov/

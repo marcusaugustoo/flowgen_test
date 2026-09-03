@@ -39,6 +39,9 @@ class SharedContext:
     failure_reports: list[str] = field(default_factory=list)
     reviews: list[str] = field(default_factory=list)
 
+    # Iteration evaluation tracking
+    iteration_results: list[dict[str, Any]] = field(default_factory=list)
+
     # Metadata
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -117,6 +120,7 @@ class SharedContext:
             "test_results": self.test_results,
             "failure_reports": self.failure_reports,
             "reviews": self.reviews,
+            "iteration_results": self.iteration_results,
             "metadata": self.metadata,
         }
 
@@ -135,6 +139,7 @@ class SharedContext:
             test_results=data.get("test_results", ""),
             failure_reports=data.get("failure_reports", []),
             reviews=data.get("reviews", []),
+            iteration_results=data.get("iteration_results", []),
             metadata=data.get("metadata", {}),
         )
 

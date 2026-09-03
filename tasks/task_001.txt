@@ -1,0 +1,11 @@
+Implemente uma função chamada is_prime que receba um número inteiro
+e retorne True caso ele seja primo e False caso contrário.
+
+A função deve funcionar corretamente para números positivos.
+Números menores ou iguais a 1 não são primos.
+
+Exemplos:
+- is_prime(2) deve retornar True
+- is_prime(4) deve retornar False
+- is_prime(17) deve retornar True
+- is_prime(1) deve retornar False

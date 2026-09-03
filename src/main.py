@@ -7,6 +7,11 @@ Usage:
     python -m src.main --config config/experiments/raw_baseline.yaml
     python -m src.main --config config/experiments/waterfall_baseline.yaml
     python -m src.main  # Uses default.yaml
+
+    # Tasks from .txt files
+    python -m src.main --task tasks/task_001.txt
+    python -m src.main --tasks tasks/
+    python -m src.main --tasks tasks/ --process waterfall --model qwen:0.5b
 """
 
 from __future__ import annotations
@@ -19,11 +24,10 @@ import time
 from pathlib import Path
 from typing import Any
 
-from src.benchmarks.humaneval import HumanEvalBenchmark
+from src.benchmarks.base import Problem
 from src.benchmarks.loaders import create_benchmark
 from src.config import ExperimentConfig
 from src.evaluation.evaluator import Evaluator
-from src.evaluation.metrics import ExecutionMetrics
 from src.evaluation.statistics import aggregate_results
 from src.llm.factory import create_llm_provider
 from src.logging_config import LLMCallLogger, setup_logging
@@ -32,8 +36,47 @@ from src.orchestration.orchestrator import Orchestrator
 from src.processes.factory import create_process
 from src.results.report_generator import ReportGenerator
 from src.results.result_store import ResultStore
+from src.tasks.task_loader import TaskLoader
 
 logger = logging.getLogger(__name__)
+
+
+def _load_problems(config: ExperimentConfig) -> tuple[list[Problem], str]:
+    """
+    Load problems from the configured source (benchmark or tasks).
+
+    Returns:
+        Tuple of (list of Problems, source name for reporting).
+    """
+    # Check if tasks path is configured
+    if config.tasks.path:
+        loader = TaskLoader()
+        tasks_path = Path(config.tasks.path)
+
+        if tasks_path.is_file():
+            tasks = [loader.load_file(tasks_path)]
+        elif tasks_path.is_dir():
+            tasks = loader.load_directory(tasks_path)
+        else:
+            raise FileNotFoundError(
+                f"Tasks path not found: {tasks_path}"
+            )
+
+        problems = [t.to_problem() for t in tasks]
+        source_name = "tasks"
+        logger.info("Loaded %d tasks from: %s", len(problems), tasks_path)
+        return problems, source_name
+
+    # Fallback to benchmark
+    benchmark = create_benchmark(config)
+    problems = benchmark.load()
+
+    if config.benchmark.subset:
+        problems = benchmark.get_subset(config.benchmark.subset)
+
+    source_name = config.benchmark.name
+    logger.info("Benchmark: %s (%d problems)", source_name, len(problems))
+    return problems, source_name
 
 
 def run_experiment(config: ExperimentConfig) -> dict[str, Any]:
@@ -62,14 +105,8 @@ def run_experiment(config: ExperimentConfig) -> dict[str, Any]:
     llm = create_llm_provider(config)
     logger.info("LLM provider: %s (%s)", config.llm.provider, config.llm.model)
 
-    # Create benchmark
-    benchmark = create_benchmark(config)
-    problems = benchmark.load()
-
-    # Apply subset if configured
-    if config.benchmark.subset:
-        problems = benchmark.get_subset(config.benchmark.subset)
-    logger.info("Benchmark: %s (%d problems)", config.benchmark.name, len(problems))
+    # Load problems from benchmark or tasks
+    problems, source_name = _load_problems(config)
 
     # Create process model
     process = create_process(config, llm)
@@ -180,7 +217,7 @@ def run_experiment(config: ExperimentConfig) -> dict[str, Any]:
     summary["experiment_name"] = config.name
     summary["model"] = config.llm.model
     summary["process"] = config.pipeline.type
-    summary["benchmark"] = config.benchmark.name
+    summary["benchmark"] = source_name
 
     # Save summary
     result_store.save_summary(summary)
@@ -189,7 +226,7 @@ def run_experiment(config: ExperimentConfig) -> dict[str, Any]:
     report_data = [{
         "model": config.llm.model,
         "process": config.pipeline.type,
-        "benchmark": config.benchmark.name,
+        "benchmark": source_name,
         "mean_pass_at_1": summary.get("mean_pass_at_1", 0.0),
         "std_pass_at_1": summary.get("std_pass_at_1", 0.0),
         "runs": summary.get("runs", 0),
@@ -240,8 +277,24 @@ def main() -> None:
         default=None,
         help="Override process type (raw, waterfall, tdd, scrum)",
     )
+    parser.add_argument(
+        "--task",
+        type=str,
+        default=None,
+        help="Path to a single .txt task file",
+    )
+    parser.add_argument(
+        "--tasks",
+        type=str,
+        default=None,
+        help="Path to a directory of .txt task files",
+    )
 
     args = parser.parse_args()
+
+    # Validate: --task and --tasks are mutually exclusive
+    if args.task and args.tasks:
+        parser.error("--task and --tasks are mutually exclusive. Use one or the other.")
 
     # Build overrides from CLI args
     overrides: dict[str, Any] = {}
@@ -251,6 +304,10 @@ def main() -> None:
         overrides.setdefault("llm", {})["model"] = args.model
     if args.process is not None:
         overrides.setdefault("pipeline", {})["type"] = args.process
+    if args.task is not None:
+        overrides.setdefault("tasks", {})["path"] = args.task
+    if args.tasks is not None:
+        overrides.setdefault("tasks", {})["path"] = args.tasks
 
     # Load config
     config = ExperimentConfig.load(

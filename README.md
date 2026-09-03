@@ -109,7 +109,106 @@ python -m src.main --config <path>       # Experiment config YAML
 python -m src.main --model <name>        # Override model
 python -m src.main --process <type>      # Override process (raw/waterfall/tdd/scrum)
 python -m src.main --runs <N>            # Override number of runs
+python -m src.main --task <path>         # Run a single .txt task file
+python -m src.main --tasks <dir>         # Run all .txt tasks in a directory
 ```
+
+## Tarefas via Arquivos `.txt`
+
+A forma mais simples de usar o FlowGen é criar arquivos `.txt` com o enunciado da tarefa.
+
+### Onde criar tarefas
+
+Coloque seus arquivos na pasta `tasks/`:
+
+```
+tasks/
+├── task_001.txt
+├── task_001_test.py    ← (testes opcionais)
+├── task_002.txt
+└── task_003.txt
+```
+
+### Como escrever uma tarefa
+
+Crie um arquivo `.txt` com o enunciado em linguagem natural. Exemplo de `task_001.txt`:
+
+```
+Implemente uma função chamada is_prime que receba um número inteiro
+e retorne True caso ele seja primo e False caso contrário.
+
+A função deve funcionar corretamente para números positivos.
+Números menores ou iguais a 1 não são primos.
+
+Exemplos:
+- is_prime(2) deve retornar True
+- is_prime(4) deve retornar False
+- is_prime(17) deve retornar True
+```
+
+O arquivo contém **somente o enunciado do problema**. Modelo, temperatura, processo e outros parâmetros continuam no YAML de configuração.
+
+### Testes canônicos (opcional)
+
+Para avaliar com Pass@1, crie um arquivo de testes ao lado da tarefa com o sufixo `_test.py`:
+
+- Tarefa: `task_001.txt`
+- Testes: `task_001_test.py`
+
+Exemplo de `task_001_test.py`:
+```python
+def check(candidate):
+    assert candidate(2) == True
+    assert candidate(4) == False
+    assert candidate(17) == True
+    assert candidate(1) == False
+
+check(is_prime)
+```
+
+O framework detecta automaticamente o arquivo de testes e o usa na avaliação.
+
+### Como executar uma tarefa
+
+```bash
+# Uma tarefa específica
+python -m src.main --task tasks/task_001.txt
+
+# Todas as tarefas da pasta
+python -m src.main --tasks tasks/
+
+# Com opções de processo e modelo
+python -m src.main --tasks tasks/ --process raw --model qwen:0.5b
+python -m src.main --tasks tasks/ --process waterfall --model qwen:0.5b
+```
+
+### Como os resultados são armazenados
+
+Os resultados ficam em `results/EXP-NNN_<nome>/`, exatamente como com benchmarks:
+
+```
+results/EXP-007_flowgen_baseline/
+├── config.yaml          # Configuração usada
+├── summary.json         # Métricas agregadas
+├── report.md            # Tabela de resultados
+└── runs/
+    └── run_001/
+        ├── results.json # Resultado por tarefa (passed/failed + prompt)
+        ├── messages.jsonl
+        └── artifacts/
+```
+
+### Como o Pass@1 é calculado
+
+Para cada tarefa, o processo gera **uma** solução candidata. Essa solução é executada contra os testes da tarefa. O resultado é `passed = true` ou `passed = false`.
+
+```
+Pass@1 = tarefas que passaram / total de tarefas
+
+Exemplo: 3 tarefas, 2 passaram → Pass@1 = 2/3 = 0.6667 = 66.67%
+```
+
+Quando há múltiplas execuções (`--runs 5`), cada run produz seu próprio Pass@1. O sistema calcula a média e o desvio padrão entre os runs.
 
 ## Changing the Model
 
