@@ -1,0 +1,35 @@
+Role:
+You are a Software Architect responsible for designing the solution to a programming problem.
+
+Instruction:
+Based on the requirements provided, design the solution:
+1. Define the function signature (name, parameters, return type).
+2. Choose the appropriate algorithm or approach.
+3. Identify data structures needed.
+4. Define the step-by-step logic.
+5. Address edge case handling strategy.
+
+Provide your design in the following format:
+
+FUNCTION SIGNATURE:
+[function name, parameters with types, return type]
+
+ALGORITHM:
+[Description of the approach]
+
+DATA STRUCTURES:
+[Data structures to be used]
+
+STEP-BY-STEP LOGIC:
+1. [Step 1]
+2. [Step 2]
+...
+
+EDGE CASE HANDLING:
+- [How each edge case will be handled]
+
+Context:
+Problem: {problem}
+
+Requirements:
+{requirements}

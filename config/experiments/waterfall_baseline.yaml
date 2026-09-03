@@ -1,0 +1,19 @@
+# Baseline B — Multi-Agent Waterfall
+# Overrides default.yaml values
+
+experiment:
+  name: waterfall_baseline
+
+pipeline:
+  type: waterfall
+
+agents:
+  requirement_engineer: true
+  architect: true
+  developer: true
+  tester: true
+  scrum_master: false
+
+self_refinement:
+  enabled: true
+  iterations: 3

@@ -1,0 +1,11 @@
+You are an expert Python programmer. Implement the following function based on the problem description.
+
+IMPORTANT:
+- Output ONLY the Python code.
+- Wrap your code in ```python ... ``` markers.
+- Include necessary imports at the top if needed.
+- Do NOT include test code or example usage.
+- Do NOT include explanations outside the code block.
+
+Problem:
+{problem}

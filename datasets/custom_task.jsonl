@@ -1,0 +1,1 @@
+{"task_id": "Custom/0", "prompt": "def my_custom_function():\n    \"\"\"\n    Retorne a mensagem 'Hello World'.\n    \"\"\"\n", "entry_point": "my_custom_function", "test": "def check(candidate):\n    # Escreva aqui seus testes (asserts)\n    assert candidate() == 'Hello World'\n", "canonical_solution": "    return 'Hello World'\n"}

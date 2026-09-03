@@ -1,0 +1,14 @@
+experiment:
+  name: custom_task_run
+  runs: 1
+
+llm:
+  provider: ollama
+  model: qwen:0.5b
+
+benchmark:
+  name: humaneval
+  dataset_path: datasets/custom_task.jsonl
+
+pipeline:
+  type: waterfall

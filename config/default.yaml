@@ -1,0 +1,46 @@
+# FlowGen 0.5b — Default Experiment Configuration
+# All parameters can be overridden by experiment-specific YAML files.
+
+experiment:
+  name: flowgen_baseline
+  seed: null            # null = no seed control; set integer for reproducibility
+  runs: 1               # Number of repeated runs per problem
+
+llm:
+  provider: ollama      # ollama | mock | openai
+  model: qwen:0.5b
+  temperature: 0.8
+  base_url: http://localhost:11434
+  timeout: 120          # seconds per LLM call
+  max_retries: 2
+
+benchmark:
+  name: humaneval       # humaneval | mbpp | humaneval_et | mbpp_et
+  dataset_path: null    # null = use built-in mini dataset; or path to .jsonl
+  subset: null          # null = all problems; or list of task_ids e.g. [0, 1, 2]
+
+pipeline:
+  type: waterfall       # raw | waterfall | tdd | scrum
+
+agents:
+  requirement_engineer: true
+  architect: true
+  developer: true
+  tester: true
+  scrum_master: false
+
+self_refinement:
+  enabled: true
+  iterations: 3
+
+evaluation:
+  timeout: 30           # seconds for code execution
+  pass_k: 1             # k value for pass@k metric
+
+logging:
+  level: INFO           # DEBUG | INFO | WARNING | ERROR
+  log_prompts: true     # Log full prompts and responses
+  log_dir: logs
+
+results:
+  output_dir: results

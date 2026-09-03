@@ -1,0 +1,19 @@
+# Baseline A — Raw Model (single LLM call)
+# Overrides default.yaml values
+
+experiment:
+  name: raw_baseline
+
+pipeline:
+  type: raw
+
+agents:
+  requirement_engineer: false
+  architect: false
+  developer: false
+  tester: false
+  scrum_master: false
+
+self_refinement:
+  enabled: false
+  iterations: 0
