@@ -1,4 +1,4 @@
-# FlowGen 0.5b — Multi-Agent Code Generation Research Platform
+# FlowGen — Multi-Agent Code Generation Research Platform
 
 Experimental research infrastructure for investigating how different multi-agent configurations and local LLM models affect code generation quality. Inspired by the FlowGen paper (SOEN-101, ICSE 2025).
 
@@ -8,7 +8,7 @@ Experimental research infrastructure for investigating how different multi-agent
 
 ```bash
 # 1. Clone and setup
-cd FlowGen_0.5b
+cd flowgen_test
 python3 -m venv .venv
 source .venv/bin/activate
 pip install pyyaml requests pytest
