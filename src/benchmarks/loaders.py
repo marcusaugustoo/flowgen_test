@@ -9,6 +9,7 @@ from __future__ import annotations
 from typing import Optional
 
 from src.benchmarks.base import BaseBenchmark
+from src.benchmarks.custom import CustomBenchmark
 from src.benchmarks.humaneval import HumanEvalBenchmark
 from src.config import ExperimentConfig
 
@@ -16,6 +17,7 @@ from src.config import ExperimentConfig
 # Registry of available benchmarks
 _BENCHMARK_REGISTRY: dict[str, type[BaseBenchmark]] = {
     "humaneval": HumanEvalBenchmark,
+    "custom": CustomBenchmark,
 }
 
 

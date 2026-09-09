@@ -15,6 +15,7 @@ from __future__ import annotations
 import logging
 import os
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -123,7 +124,7 @@ class TestExecutor:
                     f.write(script)
 
                 proc = subprocess.run(
-                    ["python", str(script_path)],
+                    [sys.executable, str(script_path)],
                     capture_output=True,
                     text=True,
                     timeout=self.timeout,

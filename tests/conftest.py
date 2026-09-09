@@ -123,3 +123,22 @@ def sample_context(sample_problem):
         entry_point=sample_problem.entry_point,
         canonical_tests=sample_problem.test,
     )
+
+
+@pytest.fixture
+def sample_custom_problem():
+    """Create a sample custom task Problem for testing."""
+    return Problem(
+        task_id="Custom/Test",
+        prompt="Implemente uma função chamada add(a, b) que retorne a soma.",
+        entry_point="add",
+        test=(
+            "def check(candidate):\n"
+            "    assert candidate(1, 2) == 3\n"
+            "    assert candidate(0, 0) == 0\n"
+            "    assert candidate(-1, 1) == 0\n"
+            "    assert candidate(100, 200) == 300\n"
+            "\ncheck(add)\n"
+        ),
+        canonical_solution="",
+    )

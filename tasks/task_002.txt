@@ -1,9 +1,0 @@
-Implemente uma função chamada fibonacci que receba um número inteiro n
-e retorne uma lista com os primeiros n números da sequência de Fibonacci.
-
-A sequência começa com 0 e 1.
-
-Exemplos:
-- fibonacci(1) deve retornar [0]
-- fibonacci(5) deve retornar [0, 1, 1, 2, 3]
-- fibonacci(8) deve retornar [0, 1, 1, 2, 3, 5, 8, 13]
